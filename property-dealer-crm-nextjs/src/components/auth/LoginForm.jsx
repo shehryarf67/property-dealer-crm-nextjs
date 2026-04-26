@@ -2,11 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-  const router = useRouter();
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -46,9 +43,9 @@ export default function LoginForm() {
       }
 
       if (data.user.role === "admin") {
-        router.push("/admin/dashboard");
+        window.location.href = "/admin/dashboard";
       } else {
-        router.push("/agent/dashboard");
+        window.location.href = "/agent/dashboard";
       }
     } catch (error) {
       setMessage("Something went wrong. Please try again.");
