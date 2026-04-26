@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import LeadForm from "@/components/leads/LeadForm";
 import LeadTable from "@/components/leads/LeadTable";
@@ -110,17 +111,35 @@ export default function LeadsPage() {
         <main className="min-h-screen bg-slate-100 p-6">
             <div className="max-w-7xl mx-auto space-y-6">
                 <header className="bg-white rounded-2xl shadow-sm p-6">
-                    <h1 className="text-3xl font-bold text-slate-900">
-                        {currentUser?.role === "admin"
-                            ? "Lead Management"
-                            : "Assigned Leads"}
-                    </h1>
+                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold text-slate-900">
+                                {currentUser?.role === "admin"
+                                    ? "Lead Management"
+                                    : "Assigned Leads"}
+                            </h1>
 
-                    <p className="text-slate-600 mt-2">
-                        {currentUser?.role === "admin"
-                            ? "Create, view, assign, score, and contact property leads."
-                            : "View and update leads assigned to you."}
-                    </p>
+                            <p className="text-slate-600 mt-2">
+                                {currentUser?.role === "admin"
+                                    ? "Create, view, assign, score, and contact property leads."
+                                    : "View and update leads assigned to you."}
+                            </p>
+                        </div>
+
+                        {currentUser && (
+                            <Link
+                                href={
+                                    currentUser.role === "admin"
+                                        ? "/admin/dashboard"
+                                        : "/agent/dashboard"
+                                }
+                                className="border border-slate-300 px-5 py-2 rounded-lg w-fit"
+                            >
+                                Go Back to Dashboard
+                            </Link>
+                        )}
+                    </div>
+
                     {lastUpdated && (
                         <p className="text-sm text-slate-400 mt-2">
                             Auto-updated at {lastUpdated.toLocaleTimeString()}
