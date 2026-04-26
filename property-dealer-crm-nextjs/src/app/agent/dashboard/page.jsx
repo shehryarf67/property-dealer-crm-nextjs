@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AgentStats from "@/components/dashboard/AgentStats";
+import LogoutButton from "@/components/auth/LogoutButton";
 
 export default function AgentDashboardPage() {
   return (
@@ -24,12 +25,7 @@ export default function AgentDashboardPage() {
                 My Leads
               </Link>
 
-              <Link
-                href="/login"
-                className="border border-slate-300 px-5 py-2 rounded-lg"
-              >
-                Logout
-              </Link>
+              <LogoutButton />
             </div>
           </div>
         </section>

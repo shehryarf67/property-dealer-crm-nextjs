@@ -6,6 +6,8 @@ import Lead from "@/models/Lead";
 import User from "@/models/User";
 import ActivityLog from "@/models/ActivityLog";
 import { sendEmail, newLeadEmailTemplate } from "@/lib/email";
+import { validateLeadData } from "@/lib/validation";
+import { rateLimit } from "@/lib/rateLimiter";
 
 export async function POST(request) {
     try {
@@ -26,6 +28,18 @@ export async function POST(request) {
                 { status: 403 }
             );
         }
+        const rateLimitResult = rateLimit({
+            key: currentUser.id,
+            limit: currentUser.role === "agent" ? 50 : 500,
+            windowMs: 60 * 1000,
+        });
+
+        if (!rateLimitResult.allowed) {
+            return NextResponse.json(
+                { message: "Too many requests. Please try again later." },
+                { status: 429 }
+            );
+        }
 
         const body = await request.json();
 
@@ -41,12 +55,11 @@ export async function POST(request) {
             followUpDate,
         } = body;
 
-        if (!name || !email || !phone || !propertyInterest || !budget) {
+        const validationErrors = validateLeadData(body);
+
+        if (validationErrors.length > 0) {
             return NextResponse.json(
-                {
-                    message:
-                        "Name, email, phone, property interest, and budget are required",
-                },
+                { message: validationErrors[0], errors: validationErrors },
                 { status: 400 }
             );
         }
