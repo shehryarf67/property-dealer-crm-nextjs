@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ActivityTimeline from "@/components/leads/ActivityTimeline";
 
 export default function LeadTable({
   leads,
@@ -12,6 +13,7 @@ export default function LeadTable({
     const [editingLead, setEditingLead] = useState(null);
     const [formData, setFormData] = useState({});
     const [message, setMessage] = useState("");
+    const [selectedLeadForActivity, setSelectedLeadForActivity] = useState(null);
 
     if (!leads || leads.length === 0) {
         return (
@@ -307,6 +309,13 @@ export default function LeadTable({
                                     ) : (
                                         <div className="flex gap-2">
                                             <button
+                                                onClick={() => setSelectedLeadForActivity(lead._id)}
+                                                className="border border-slate-300 px-3 py-2 rounded-lg"
+                                            >
+                                                Timeline
+                                            </button>
+
+                                            <button
                                                 onClick={() => startEditing(lead)}
                                                 className="border border-slate-300 px-3 py-2 rounded-lg"
                                             >
@@ -329,6 +338,13 @@ export default function LeadTable({
                     })}
                 </tbody>
             </table>
+
+            {selectedLeadForActivity && (
+                <ActivityTimeline
+                    leadId={selectedLeadForActivity}
+                    onClose={() => setSelectedLeadForActivity(null)}
+                />
+            )}
         </section>
     );
 }
