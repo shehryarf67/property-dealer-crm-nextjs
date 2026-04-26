@@ -1,0 +1,27 @@
+import Link from "next/link";
+
+export default function AgentDashboardPage() {
+  return (
+    <main className="min-h-screen bg-slate-100 p-8">
+      <section className="bg-white rounded-2xl shadow-sm p-8">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">
+              Agent Dashboard
+            </h1>
+            <p className="text-slate-600 mt-2">
+              Agent view for assigned leads, follow-ups, and lead activity.
+            </p>
+          </div>
+
+          <Link
+            href="/login"
+            className="bg-slate-900 text-white px-5 py-2 rounded-lg"
+          >
+            Logout
+          </Link>
+        </div>
+      </section>
+    </main>
+  );
+}
