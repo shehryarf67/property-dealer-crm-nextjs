@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 
-export function middleware(request) {
+const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+
+export async function middleware(request) {
   const token = request.cookies.get("token")?.value;
   const { pathname } = request.nextUrl;
 
   const isAdminRoute = pathname.startsWith("/admin");
   const isAgentRoute = pathname.startsWith("/agent");
-  const isProtectedRoute = isAdminRoute || isAgentRoute || pathname.startsWith("/leads");
+  const isProtectedRoute =
+    isAdminRoute || isAgentRoute || pathname.startsWith("/leads");
 
   if (!isProtectedRoute) {
     return NextResponse.next();
@@ -18,13 +21,13 @@ export function middleware(request) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { payload } = await jwtVerify(token, secret);
 
-    if (isAdminRoute && decoded.role !== "admin") {
+    if (isAdminRoute && payload.role !== "admin") {
       return NextResponse.redirect(new URL("/agent/dashboard", request.url));
     }
 
-    if (isAgentRoute && decoded.role !== "agent") {
+    if (isAgentRoute && payload.role !== "agent") {
       return NextResponse.redirect(new URL("/admin/dashboard", request.url));
     }
 
