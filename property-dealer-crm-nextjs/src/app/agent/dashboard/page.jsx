@@ -14,12 +14,21 @@ export default function AgentDashboardPage() {
             </p>
           </div>
 
-          <Link
-            href="/login"
-            className="bg-slate-900 text-white px-5 py-2 rounded-lg"
-          >
-            Logout
-          </Link>
+          <div className="flex gap-3">
+            <Link
+              href="/leads"
+              className="bg-slate-900 text-white px-5 py-2 rounded-lg"
+            >
+              My Leads
+            </Link>
+
+            <Link
+              href="/login"
+              className="border border-slate-300 px-5 py-2 rounded-lg"
+            >
+              Logout
+            </Link>
+          </div>
         </div>
       </section>
     </main>
