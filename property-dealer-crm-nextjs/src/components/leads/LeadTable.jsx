@@ -4,11 +4,11 @@ import { useState } from "react";
 import ActivityTimeline from "@/components/leads/ActivityTimeline";
 
 export default function LeadTable({
-  leads,
-  agents,
-  currentUser,
-  onLeadUpdated,
-  onLeadDeleted,
+    leads,
+    agents,
+    currentUser,
+    onLeadUpdated,
+    onLeadDeleted,
 }) {
     const [editingLead, setEditingLead] = useState(null);
     const [formData, setFormData] = useState({});
@@ -135,6 +135,34 @@ export default function LeadTable({
         }
     }
 
+    function isOverdue(followUpDate) {
+        if (!followUpDate) {
+            return false;
+        }
+
+        const today = new Date();
+        const followUp = new Date(followUpDate);
+
+        today.setHours(0, 0, 0, 0);
+        followUp.setHours(0, 0, 0, 0);
+
+        return followUp < today;
+    }
+
+    function isStale(lastActivityAt) {
+        if (!lastActivityAt) {
+            return false;
+        }
+
+        const today = new Date();
+        const lastActivity = new Date(lastActivityAt);
+        const differenceInDays = Math.floor(
+            (today - lastActivity) / (1000 * 60 * 60 * 24)
+        );
+
+        return differenceInDays >= 7;
+    }
+
     return (
         <section className="bg-white rounded-2xl shadow-sm p-6 overflow-x-auto">
             <h2 className="text-xl font-bold text-slate-900 mb-4">Leads</h2>
@@ -152,6 +180,7 @@ export default function LeadTable({
                         <th className="py-3 pr-4">Budget</th>
                         <th className="py-3 pr-4">Status</th>
                         <th className="py-3 pr-4">Priority</th>
+                        <th className="py-3 pr-4">Follow-up</th>
                         <th className="py-3 pr-4">WhatsApp</th>
                         {currentUser?.role === "admin" && (
                             <th className="py-3 pr-4">Assigned To</th>
@@ -165,7 +194,16 @@ export default function LeadTable({
                         const isEditing = editingLead === lead._id;
 
                         return (
-                            <tr key={lead._id} className="border-b border-slate-100 align-top">
+                            <tr
+                                key={lead._id}
+                                className={`border-b border-slate-100 align-top ${
+                                    isOverdue(lead.followUpDate)
+                                        ? "bg-red-50"
+                                        : isStale(lead.lastActivityAt)
+                                            ? "bg-orange-50"
+                                            : ""
+                                }`}
+                            >
                                 <td className="py-3 pr-4">
                                     {isEditing ? (
                                         <input
@@ -258,6 +296,38 @@ export default function LeadTable({
                                     >
                                         {lead.score}
                                     </span>
+                                </td>
+
+                                <td className="py-3 pr-4">
+                                    {isEditing ? (
+                                        <input
+                                            name="followUpDate"
+                                            type="date"
+                                            value={formData.followUpDate}
+                                            onChange={handleChange}
+                                            className="border border-slate-300 rounded-lg px-3 py-2"
+                                        />
+                                    ) : (
+                                        <div className="space-y-1">
+                                            <p>
+                                                {lead.followUpDate
+                                                    ? new Date(lead.followUpDate).toLocaleDateString()
+                                                    : "Not set"}
+                                            </p>
+
+                                            {isOverdue(lead.followUpDate) && (
+                                                <span className="inline-block bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">
+                                                    Overdue
+                                                </span>
+                                            )}
+
+                                            {isStale(lead.lastActivityAt) && (
+                                                <span className="inline-block bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full">
+                                                    Stale
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
                                 </td>
 
                                 <td className="py-3 pr-4">
